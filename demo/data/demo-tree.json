@@ -1,0 +1,76 @@
+{
+    "name": "会金",
+    "children": [{
+            "name": "良系",
+            "children": [{
+                    "name": "作平",
+                    "wife": [
+                        {
+                            "name": "郭氏"
+                        }
+                    ],
+                    "children": [{
+                            "name": "善凯",
+                            "children": [{
+                                    "name": "跃军"
+                                },
+                                {
+                                    "name": "跃文"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "善策",
+                            "children": [{
+                                    "name": "跃明"
+                                },
+                                {
+                                    "name": "跃林"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "桂莲",
+                    "gender": 0
+                },
+                {
+                    "name": "艳红",
+                    "gender": 0
+                }
+            ]
+        },
+        {
+            "name": "良俊",
+            "children": [{
+                    "name": "作苏"
+                },
+                {
+                    "name": "东莲"
+                }
+            ]
+        },
+        {
+            "name": "良蔈"
+        },
+        {
+            "name": "良A"
+        },
+        {
+            "name": "良B"
+        },
+        {
+            "name": "良C"
+        },
+        {
+            "name": "良D"
+        },
+        {
+            "name": "良E"
+        },
+        {
+            "name": "良F"
+        }
+    ]
+}

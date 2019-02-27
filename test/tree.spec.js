@@ -1,8 +1,9 @@
 /* global describe, it, before */
-import 'mocha-jsdom';
 import chai from 'chai';
-import spies  from 'chai-spies';
-import {Tree} from '../lib/family-tree.js';
+import spies from 'chai-spies';
+import {
+  Tree
+} from '../lib/family-tree.js';
 
 chai.use(spies);
 chai.expect();
@@ -13,39 +14,39 @@ let tree;
 
 describe('Create a Tree', () => {
   before(() => {
-    tree = new Tree({});
+    tree = new Tree();
   });
-  
+
   describe('When providing empty props', () => {
     it('should return the tree props with default value', () => {
-      expect(tree.props).to.deep.eql({ selector: "body" });
+      expect(tree.selector).to.deep.eql('body');
     });
 
     it('should have a public canvas created', () => {
-      expect(tree.svg).to.not.null;
+      expect(tree.canvas).to.not.null;
     });
 
     it('should have default width and height', () => {
-      expect(tree.svg.attr('width')).to.equal('960');
-      expect(tree.svg.attr('height')).to.equal('600');
+      expect(tree.canvas.attr('width')).to.equal('960');
+      expect(tree.canvas.attr('height')).to.equal('600');
     });
 
     it('should not zoomable', () => {
-      const spy = chai.spy.on(tree.svg, 'call');
-      expect(tree.svg.call).to.have.not.been.called;
+      const spy = chai.spy.on(tree.canvas, 'call');
+
+      expect(spy).to.have.not.been.called;
     });
   });
-  
+
 });
 
-
 describe('Create a Tree', () => {
-  let zoomed = function() {};
+  let zoomed = function () {};
   let settings = {
     selector: '#tree',
     canvasSetting: {
-      width: 1000,
-      height: 800,
+      width: 960,
+      height: 600,
       margin: {
         left: 10,
         right: 10,
@@ -61,7 +62,7 @@ describe('Create a Tree', () => {
   };
 
   before(() => {
-    tree = new Tree(settings);
+    tree = new Tree({}, settings);
     document.body.innerHTML = '<div id="tree">hola</div>';
   });
 
@@ -71,19 +72,27 @@ describe('Create a Tree', () => {
     });
 
     it('should have the given width and height', () => {
-      let { 
-        width, 
-        height, 
-        margin = { left: 0, right: 0, top: 0, bottom: 0 } 
+      let {
+        width,
+        height,
+        margin = {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0
+        }
       } = settings.canvasSetting;
-      expect(parseInt(tree.svg.attr('width'), 10)).to.equal(width + margin.right + margin.left);
-      expect(parseInt(tree.svg.attr('height'), 10)).to.equal(height + margin.top + margin.bottom);
+
+      // console.log(tree);
+      expect(parseInt(tree.canvas.attr('width'), 10)).to.equal(width + margin.right + margin.left);
+      expect(parseInt(tree.canvas.attr('height'), 10)).to.equal(height + margin.top + margin.bottom);
     });
 
     it('should zoomable', () => {
-      const spy = chai.spy.on(tree.svg, 'call');
-      expect(tree.svg.call).to.have.been.called;
+      const spy = chai.spy.on(tree.canvas, 'call');
+
+      expect(spy).to.have.been.called;
     });
   });
-  
+
 });

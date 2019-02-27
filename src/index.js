@@ -1,6 +1,6 @@
 import Tree from './tree.js';
 import Node from './node.js';
-import Source from './source.js';
+import Hierarchy from './hierachy';
 import Line from './line.js';
 
-export { Tree, Node, Source, Line };
+export { Tree, Node, Hierarchy, Line };

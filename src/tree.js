@@ -69,6 +69,14 @@ export default class Tree {
     return this._svg;
   }
 
+  get node() {
+    return this._node;
+  }
+
+  get animationTimeout() {
+    return 750;
+  }
+
   _initCavas() {
     if (!this.selector) {
       this._props.selector = 'body';
@@ -103,9 +111,8 @@ export default class Tree {
     this._initCavas();
 
     // generate nodes
-    let node = new Node(this);
-
-    node.load();
+    this._node = new Node(this);
+    this._node.load();
   }
 
 }

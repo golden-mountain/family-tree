@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import Hierarchy from './hierachy';
+import Events from './events';
 
 export default class Node {
   constructor(tree, props = {}) {
@@ -10,6 +11,7 @@ export default class Node {
     this._tree = tree;
     this._props = props;
     this._index = 0;
+    this._events = new Events(tree);
   }
 
   get name() {
@@ -44,62 +46,192 @@ export default class Node {
     return this._mappedData;
   }
 
-  get nodes() {
+  get dataNodes() {
     return this.mappedData.descendants();
   }
 
-  get links() {
-    return this.nodes.slice(1);
+  get dataLinks() {
+    return this.dataNodes.slice(1);
   }
 
-  get node() {
-    return this._node;
+  get treeNodes() {
+    return this._treeNodes;
   }
 
-  _initNodes() {
-    // init depth
-    this.nodes.forEach((d) => {
-      d.y = d.depth * this.depth;
-    });
+  get nodeRootSelector() {
+    return this._props.nodeSelector || 'g';
   }
 
-  _enterNodes() {
-    this._enteredNodes = this._node.enter().append('g')
-      .attr('class', 'node')
-      .attr('transform', (d) => {
-        return `translate(${this._hierarchy.x0},${this._hierarchy.y0})`;
-      })
-      .style('cursor', 'pointer');
+  get nodeClassName() {
+    return this._props.nodeClassName || 'node';
+  }
 
-    this._enteredNodes.append('rect')
-      .attr('rx', 5)
-      .attr('ry', 5)
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .style('fill', (d) => {
+  get nodeStyles() {
+    return this._props.nodeStyle || {
+      'cursor': 'pointer',
+      'fill': (d) => {
         if (d.data.gender !== 0) {
           return 'gray';
         }
         return 'pink';
-      })
-      .style('stroke', 'black')
-      .style('stroke-width', 1)
-      .style('fill-opacity', 0.5)
-      .style('stroke-opacity', 0.3);
+      },
+      'stroke': 'black',
+      'stroke-width': 1,
+      'fill-opacity': 0.5,
+      'stroke-opacity': 0.3
+    };
   }
 
-  load() {
+  get nodeAttrs() {
+    return this._props.nodeAttrs || {
+      rx: 5,
+      ry: 5,
+      width: this.width,
+      height: this.height
+    };
+  }
+
+  get nodeLabelAttrs() {
+    return this._props.nodeLabelAttrs || {
+      'dx': '.35em',
+      'x': (d) => {
+        return this.width / 2 - 5;
+      },
+      'y': (d) => {
+        return this.height / 2 - 5;
+      },
+      'text-anchor': (d) => {
+        return 'middle';
+      }
+    };
+  }
+
+  get nodeText() {
+    return this._props.nodeLabelText ||
+      function (d) {
+        return d.data.name;
+      };
+  }
+
+  _initNodes(previousNode) {
+    // init depth
+    this.dataNodes.forEach((d) => {
+      d.y = d.depth * this.depth;
+    });
+
+    this._treeNodes = this._tree.canvas.selectAll(`${this.nodeSelector}.${this.nodeClassName}`)
+      .data(this.dataNodes, (d) => {
+        return d.id || (d.id = ++this._index);
+      });
+    this._enterNodes(previousNode);
+    this._appendLabels();
+    this._appendExpander();
+
+    let nodeUpdate = this._domNodes.merge(this._treeNodes);
+
+    // Transition to the proper position for the node
+    nodeUpdate.transition()
+      .duration(this._tree.animationTimeout)
+      .attr('transform', (d) => {
+        // TO FIX: Crashed on UT use this line
+        // return `translate(${d.x - this.width / 2},${d.y - this.height / 2})`;
+        return `translate(${d.x},${d.y})`;
+      });
+
+    // Store the old positions for transition.
+    this.dataNodes.forEach((d) => {
+      d.x0 = d.x;
+      d.y0 = d.y;
+    });
+  }
+
+  _enterNodes(previousNode) {
+    this._domNodes = this._treeNodes.enter().append(this.nodeRootSelector)
+      .attr('class', this.nodeClassName)
+      .attr('transform', (d) => {
+        return `translate(${previousNode.x0},${previousNode.y0})`;
+      });
+
+    let rects = this._domNodes.append('rect');
+
+    // append attrs
+    for (let key in this.nodeAttrs) {
+      rects.style(key, this.nodeAttrs[key]);
+    }
+
+    // append styles
+    for (let key in this.nodeStyles) {
+      rects.style(key, this.nodeStyles[key]);
+    }
+  }
+
+  _appendLabels() {
+    const texts = this._domNodes.append('text');
+
+    // append styles
+    for (let key in this.nodeLabelAttrs) {
+      texts.attr(key, this.nodeLabelAttrs[key]);
+    }
+
+    texts.text(this.nodeLabelText);
+  }
+
+  _appendExpander() {
+    const expander = this._domNodes.append('g');
+
+    expander
+      .style('display', (d) => {
+        if (d._children || d.children) {
+          return 'block';
+        }
+        return 'none';
+      })
+      .attr('transform', (d) => {
+        return `ranslate(${this.width / 2},${this.height + 5})`;
+      })
+      .on('click', this._events.expandingChildren);
+
+    expander.append('circle')
+      .attr('r', 5)
+      .style('stroke', 'black')
+      .style('stroke-width', 1)
+      .style('fill', (d) => {
+        // console.log(d.children, d.data.name);
+        if (d._children === null) {
+          return 'red';
+        }
+        return 'white';
+      });
+
+    expander.append('text')
+      .attr('text-anchor', 'end')
+      .attr('transform', () => {
+        return 'translate(3.5,4.5)';
+      })
+      .text('+');
+
+    return expander;
+  }
+
+  load(previousNode) {
     // to refact
     this._hierarchy = new Hierarchy(this);
     this._treemap = d3.tree().size([this.width, this.height]);
     this._mappedData = this._treemap(this._hierarchy.instance);
-    this._initNodes();
+    // console.log(this._hierarchy.instance);
+    this._initNodes(previousNode || this._hierarchy.instance);
+    this._registerExit(previousNode);
+  }
 
-    this._node = this._tree.canvas.selectAll('g.node')
-      .data(this.nodes, (d) => {
-        return d.id || (d.id = ++this._index);
-      });
+  _registerExit(previousNode) {
+    let nodeExit = this._treeNodes.exit().transition()
+      .duration(this._tree.animationTimeout)
+      .attr('transform', (d) => {
+        return `translate(${previousNode.x - this.width / 2},${previousNode.y - this.height / 2})`;
+      })
+      .remove();
 
-    this._enterNodes();
+    nodeExit.select('text')
+      .style('fill-opacity', 1e-6);
   }
 }

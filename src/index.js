@@ -4,6 +4,8 @@ import Hierarchy from './hierachy';
 import Line from './line.js';
 import Events from './events.js';
 
+window.Tree = Tree;
+
 export {
   Tree,
   Node,

@@ -1,5 +1,3 @@
-import * as d3 from 'd3';
-import Hierarchy from './hierachy';
 import Events from './events';
 
 export default class Node {
@@ -39,11 +37,11 @@ export default class Node {
   }
 
   get hierarchy() {
-    return this._hierarchy;
+    return this._tree.hierarchy;
   }
 
   get mappedData() {
-    return this._mappedData;
+    return this._tree.mappedData;
   }
 
   get dataNodes() {
@@ -173,7 +171,7 @@ export default class Node {
       texts.attr(key, this.nodeLabelAttrs[key]);
     }
 
-    texts.text(this.nodeLabelText);
+    texts.text(this.nodeText);
   }
 
   _appendExpander() {
@@ -187,7 +185,7 @@ export default class Node {
         return 'none';
       })
       .attr('transform', (d) => {
-        return `ranslate(${this.width / 2},${this.height + 5})`;
+        return `translate(${this.width / 2},${this.height + 5})`;
       })
       .on('click', this._events.expandingChildren);
 
@@ -214,12 +212,7 @@ export default class Node {
   }
 
   load(previousNode) {
-    // to refact
-    this._hierarchy = new Hierarchy(this);
-    this._treemap = d3.tree().size([this.width, this.height]);
-    this._mappedData = this._treemap(this._hierarchy.instance);
-    // console.log(this._hierarchy.instance);
-    this._initNodes(previousNode || this._hierarchy.instance);
+    this._initNodes(previousNode || this.hierarchy.instance);
     this._registerExit(previousNode);
   }
 

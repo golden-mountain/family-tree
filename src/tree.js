@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 import Node from './node';
+import Hierarchy from './hierachy';
+import Line from './line';
 
 export default class Tree {
 
@@ -54,7 +56,7 @@ export default class Tree {
   get zoom() {
     return this._props.zoom || {
       transform: () => {
-        this.svg.attr('transform', d3.event.transform);
+        this.canvas.attr('transform', d3.event.transform);
       },
       minScale: 0.1,
       maxScale: 1
@@ -75,6 +77,14 @@ export default class Tree {
 
   get animationTimeout() {
     return 750;
+  }
+
+  get hierarchy() {
+    return this._hierarchy;
+  }
+
+  get mappedData() {
+    return this._mappedData;
   }
 
   _initCavas() {
@@ -109,10 +119,17 @@ export default class Tree {
 
   load() {
     this._initCavas();
+    this._hierarchy = new Hierarchy(this);
+    this._treemap = d3.tree().size([this.width, this.height]);
+    this._mappedData = this._treemap(this._hierarchy.instance);
 
     // generate nodes
     this._node = new Node(this);
     this._node.load();
+
+    // generate lines
+    this._line = new Line(this);
+    this._line.load(this.hierarchy.instance);
   }
 
 }

@@ -19,7 +19,7 @@ if (env === 'build') {
 
 const config = {
   mode: mode,
-  entry: __dirname + '/src/index.js',
+  entry: __dirname + '/src/index.ts',
   devtool: 'inline-source-map',
   output: {
     path: __dirname + '/lib',
@@ -31,21 +31,25 @@ const config = {
   },
   module: {
     rules: [
+      // {
+      //   test: /(\.jsx|\.js)$/,
+      //   loader: 'babel-loader',
+      //   exclude: /(node_modules|bower_components)/
+      // },
+      // {
+      //   test: /(\.jsx|\.js)$/,
+      //   loader: 'eslint-loader',
+      //   exclude: /node_modules/
+      // },
       {
-        test: /(\.jsx|\.js)$/,
-        loader: 'babel-loader',
-        exclude: /(node_modules|bower_components)/
-      },
-      {
-        test: /(\.jsx|\.js)$/,
-        loader: 'eslint-loader',
-        exclude: /node_modules/
+        test: /\.tsx?$/,
+        loader: 'ts-loader'
       }
     ]
   },
   resolve: {
     modules: [path.resolve('./node_modules'), path.resolve('./src')],
-    extensions: ['.json', '.js']
+    extensions: ['.json', '.js', '.ts', '.tsx']
   }
 };
 

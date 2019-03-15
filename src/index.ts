@@ -1,1 +1,9 @@
-export { default, default as Tree } from './tree';
+import Tree from './tree';
+
+declare global {
+  interface Window { Tree: any; }
+}
+
+window.Tree = Tree || {};
+
+export default Tree;

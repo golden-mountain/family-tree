@@ -38,7 +38,7 @@ export default class Node implements INode {
       .duration(this.tree.props.animationTimeout)
       .attr('transform', (d: any) => {
         // TO FIX: Crashed on UT use this line
-        return `translate(${d.x - this.props.width / 2},${d.y - this.props.height / 2})`;
+        return `translate(${d.x - this.props.width / 2},${d.y})`;
         // return `translate(${d.x},${d.y})`;
       });
 

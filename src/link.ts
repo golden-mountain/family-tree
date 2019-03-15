@@ -13,7 +13,7 @@ export default class Link {
 
   private straightLine(source: any, target: any) {
     let y = (source.y + target.y) / 2;
-    let diagonal = `M${source.x},${source.y - this.tree.props.node.height / 2}
+    let diagonal = `M${source.x},${source.y}
     L${source.x},${y} L${target.x},${y} L${target.x},${target.y + this.tree.props.node.height / 2}`;
 
     return diagonal;

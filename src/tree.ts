@@ -42,7 +42,7 @@ export default class Tree implements ITree {
       width: 50,
       height: 30,
       radius: 5,
-      depth: 5,
+      depth: 120,
       selector: 'g',
       klass: 'node',
       styles: {
@@ -124,9 +124,11 @@ export default class Tree implements ITree {
   public canvas: any;
   public mappedHierarchy: any;
 
-  constructor(data: object = {}, props: ITreeProps = {}) {
+  constructor(data: object, props?: ITreeProps) {
     this.data = data;
-    this.props = props;
+    if (props) {
+      this.props = props;
+    }
     this.load();
   }
 
@@ -154,7 +156,7 @@ export default class Tree implements ITree {
     };
 
     this.zoom = d3.zoom()
-      .scaleExtent([this.zoom.minScale, this.zoom.maxScale])
+      .scaleExtent([this.props.zoom.minScale, this.props.zoom.maxScale])
       .on('zoom', zoomed);
     return this.zoom;
   }
@@ -179,3 +181,4 @@ export default class Tree implements ITree {
   }
 
 }
+

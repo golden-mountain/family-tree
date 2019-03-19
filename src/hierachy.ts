@@ -12,7 +12,7 @@ export default class Hierarchy {
   }
 
   createInstance() {
-    let hierarchy: any = d3.hierarchy(this.data, function (d) {
+    const hierarchy: any = d3.hierarchy(this.data, function (d) {
       return d.children;
     });
 

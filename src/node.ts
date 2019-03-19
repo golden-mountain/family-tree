@@ -1,4 +1,7 @@
-import Events from './events';
+import * as d3 from 'd3';
+// import Events from './events';
+// import Hierarchy from './hierachy';
+import Link from './link';
 
 export default class Node implements INode {
   public readonly name: string = 'Node';
@@ -9,25 +12,27 @@ export default class Node implements INode {
   // private dataLinks: any;
   private treeNodes: any;
   private domNodes: any;
-  private index: number;
+  private index: number = 0;
+
+  // public treemap: any;
+  public mappedHierarchy: any;
+  public link: ILink;
 
   constructor(private tree: ITree) {
-    this.dataNodes = this.tree.mappedHierarchy.descendants();
+    // this.dataNodes = this.tree.mappedHierarchy.descendants();
     // this.dataLinks = this.dataNodes.slice(1);
     this.props = this.tree.props.node;
   }
 
-  private initNodes(previousNode: any): void {
+  private initNodes(hierarchy: any): void {
     // init depth
     this.dataNodes.forEach((d: any) => {
       d.y = d.depth * this.props.depth;
+      d.x0 = d.x;
+      d.y0 = d.y;
     });
 
-    this.treeNodes = this.tree.canvas.selectAll(`${this.props.selector}.${this.props.klass}`)
-      .data(this.dataNodes, (d: any) => {
-        return d.id || (d.id = ++this.index);
-      });
-    this.enterNodes(previousNode);
+    this.enterNodes(hierarchy);
     this.appendLabels();
     this.appendExpander();
 
@@ -42,18 +47,23 @@ export default class Node implements INode {
         // return `translate(${d.x},${d.y})`;
       });
 
-    // Store the old positions for transition.
-    this.dataNodes.forEach((d: any) => {
-      d.x0 = d.x;
-      d.y0 = d.y;
-    });
+    // // Store the old positions for transition.
+    // this.dataNodes.forEach((d: any) => {
+    //   d.x0 = d.x;
+    //   d.y0 = d.y;
+    // });
   }
 
-  private enterNodes(previousNode: any): void {
+  private enterNodes(hierarchy: any): void {
+    this.treeNodes = this.tree.canvas.selectAll(`${this.props.selector}.${this.props.class}`)
+      .data(this.dataNodes, (d: any) => {
+        return d.id || (d.id = ++this.index);
+      });
+
     this.domNodes = this.treeNodes.enter().append(this.props.selector)
-      .attr('class', this.props.klass)
+      .attr('class', this.props.class)
       .attr('transform', (d: any) => {
-        return `translate(${previousNode.x0},${previousNode.y0})`;
+        return `translate(${hierarchy.x0},${hierarchy.y0})`;
       });
 
     let rects = this.domNodes.append('rect');
@@ -93,7 +103,7 @@ export default class Node implements INode {
       .attr('transform', (d: any) => {
         return `translate(${this.props.width / 2},${this.props.height + 5})`;
       })
-      .on('click', this.tree.events.expandingChildren);
+      .on('click', this.tree.events.expandingChildren.bind(this.tree.events));
 
     const circleExpanders = expander.append(this.props.expander.selector);
     // append attrs
@@ -111,16 +121,16 @@ export default class Node implements INode {
     for (let key in this.props.expander.text.attrs) {
       expanderText.attr(key, this.props.expander.text.attrs[key]);
     }
-    expanderText.text('+');
+    expanderText.text(this.props.expander.text.text);
 
     return expander;
   }
 
-  private registerExit(previousNode: any): void {
+  private registerExit(hierarchy: any): void {
     const nodeExit = this.treeNodes.exit().transition()
       .duration(this.tree.props.animationTimeout)
       .attr('transform', (d: any) => {
-        return `translate(${previousNode.x - this.props.width / 2},${previousNode.y - this.props.height / 2})`;
+        return `translate(${hierarchy.x - this.props.width / 2},${hierarchy.y - this.props.height / 2})`;
       })
       .remove();
 
@@ -128,11 +138,19 @@ export default class Node implements INode {
       .style('fill-opacity', 1e-6);
   }
 
-  load(previousNode: any) {
-    const preNode = previousNode || this.tree.hierarchy.instance;
+  public load(hierarchy: any) {
+    const treemap = d3.tree().size([this.tree.props.canvas.width, this.tree.props.canvas.height]);
+    const mappedHierarchy = treemap(this.tree.hierarchy.instance);
+    this.dataNodes = mappedHierarchy.descendants();
 
-    this.initNodes(preNode);
-    this.registerExit(preNode);
+    // const preNode = hierarchy || this.tree.hierarchy.instance;
+    this.initNodes(hierarchy);
+    this.registerExit(hierarchy);
+
+    // TO Fix: it should not depend on node
+    this.link = new Link(this.tree);
+    const links = mappedHierarchy.descendants().slice(1);
+    this.link.load(hierarchy, links);
   }
 
 }

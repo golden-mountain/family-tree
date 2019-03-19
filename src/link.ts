@@ -7,7 +7,6 @@ export default class Link {
   public props: ILinkProps = {}
 
   constructor(private tree: ITree) {
-    this.links = this.tree.mappedHierarchy.descendants().slice(1);
     this.props = this.tree.props.link;
   }
 
@@ -49,31 +48,33 @@ export default class Link {
     return typeFunc.call(this, source, target);
   }
 
-  load(previousNode: any) {
-    let preNode = previousNode || this.tree.hierarchy.instance;
+  load(previousNode: any, links: any) {
+    // this.links = this.tree.node.mappedHierarchy.descendants().slice(1);
+
+    // let preNode = previousNode || this.tree.hierarchy.instance;
     // Update the links...
-    let link = this.tree.canvas.selectAll('path.link')
-      .data(this.links, function (d: any) {
+    const link = this.tree.canvas.selectAll('path.link')
+      .data(links, function (d: any) {
         return d.id;
       });
 
     // Enter any new links at the parent's previous position.
-    let linkEnter = link.enter().insert('path', 'g');
+    const linkEnter = link.enter().insert('path', 'g');
     // append attrs
-    for (let key in this.props.attrs) {
+    for (const key in this.props.attrs) {
       linkEnter.attr(key, this.props.attrs[key]);
     }
     linkEnter.attr('d', (d: any) => {
-      let o = {
-        x: preNode.x0,
-        y: preNode.y0
+      const o = {
+        x: previousNode.x0,
+        y: previousNode.y0
       };
-
+      // console.log(d);
       return this.diagonal(o, o);
     });
 
     // append attrs
-    for (let key in this.props.styles) {
+    for (const key in this.props.styles) {
       linkEnter.style(key, this.props.styles[key]);
     }
 
@@ -89,17 +90,16 @@ export default class Link {
       });
 
     // Remove any exiting links
-    let linkExit = link.exit();
+    const linkExit = link.exit();
 
     linkExit
       .transition()
       .duration(this.tree.props.animationTimeout)
       .attr('d', (d: any) => {
         let o = {
-          x: preNode.x,
-          y: preNode.y
+          x: previousNode.x,
+          y: previousNode.y
         };
-
         return this.diagonal(o, o);
       })
       .remove();

@@ -14,15 +14,17 @@ export default class Events {
       d.children = d._children;
       d._children = null;
     }
-    this._checkWidth(d);
+
+    this.checkWidth(d);
+    console.log(d);
     this.tree.node.load(d);
   }
 
-  _checkWidth(d: any) {
+  private checkWidth(d: any) {
     let currentCanvas = this.tree.canvas;
-    let adjustedHeight = parseInt(d3.select('#map>svg').attr('height'), 10);
+    let adjustedHeight = parseInt(d3.select(this.tree.props.selector + '>svg').attr('height'), 10);
     // let adjustedHeight = parseInt(currentCanvas.attr('height'), 10);
-    const margin = currentCanvas.margin;
+    const margin = this.tree.props.canvas.margin;
 
     // currentWidth = currentCanvas.node().getBBox().width,
     setTimeout(function () {

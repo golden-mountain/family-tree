@@ -10,13 +10,10 @@ declare interface ITree extends IObject {
   props: ITreeProps,
   node: INode,
   hierarchy: IHierarchy,
-  link: ILink,
   events: IEvents,
   // below are d3 objects
   zoom: any,
-  treemap: any,
   canvas: any,
-  mappedHierarchy: any,
   load: () => void
 }
 
@@ -29,7 +26,9 @@ declare interface ITreeProps {
   zoom?: IZoomProps,
   node?: INodeProps,
   link?: ILinkProps,
-  animationTimeout?: number
+  animationTimeout?: number,
+  treemap?: any,
+  mappedHierarchy?: any,
 }
 
 declare interface INodeProps {
@@ -38,7 +37,7 @@ declare interface INodeProps {
   radius?: number,
   depth?: number,
   selector?: string,
-  klass?: string,
+  class?: string,
   styles?: any,
   attrs?: any,
   label?: ILabel,
@@ -85,6 +84,8 @@ declare interface IExpander {
  * Node Interface
  */
 declare interface INode extends IObject {
+  mappedHierarchy: any,
+  link: ILink,
   load: (previousNode?: any) => void
 }
 
@@ -109,7 +110,7 @@ declare interface IZoomProps {
  */
 declare interface ILink extends IObject {
   props?: ILinkProps,
-  load: (previousNode?: any) => void
+  load: (previousNode?: any, links?: any) => void
 }
 
 /**

@@ -38,6 +38,11 @@ export default class Tree implements ITree {
     this.canvas = d3.select(this.props.selector)
       .append('svg');
 
+    // append attrs
+    for (const key in this.props.canvas.attrs) {
+      this.canvas.attr(key, this.props.canvas.attrs[key]);
+    }
+
     this.canvas
       .attr('width', this.props.canvas.width +
         this.props.canvas.margin.right + this.props.canvas.margin.left)
@@ -45,7 +50,6 @@ export default class Tree implements ITree {
         this.props.canvas.margin.bottom);
 
     this.canvas.call(this.initZoom());
-
     // add first element, a 'g'
     this.canvas.append('g')
       .attr('transform', `translate(${this.props.canvas.margin.left},
@@ -66,8 +70,6 @@ export default class Tree implements ITree {
   public load(): void {
     this.initCavas();
     this.hierarchy = new Hierarchy(this);
-    // this.treemap = d3.tree().size([this.props.canvas.width, this.props.canvas.height]);
-    // this.mappedHierarchy = this.treemap(this.hierarchy.instance);
 
     // initial events
     this.events = new Events(this);
@@ -75,11 +77,6 @@ export default class Tree implements ITree {
     // generate nodes
     this.node = new Node(this);
     this.node.load(this.hierarchy.instance);
-
-    // generate links
-    // TO Fix: it should not depend on node
-    // this.link = new Link(this);
-    // this.link.load();
   }
 
 }

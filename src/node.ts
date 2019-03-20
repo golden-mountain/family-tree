@@ -14,13 +14,7 @@ export default class Node implements INode {
   private domNodes: any;
   private index: number = 0;
 
-  // public treemap: any;
-  public mappedHierarchy: any;
-  public link: ILink;
-
   constructor(private tree: ITree) {
-    // this.dataNodes = this.tree.mappedHierarchy.descendants();
-    // this.dataLinks = this.dataNodes.slice(1);
     this.props = this.tree.props.node;
   }
 
@@ -47,11 +41,6 @@ export default class Node implements INode {
         // return `translate(${d.x},${d.y})`;
       });
 
-    // // Store the old positions for transition.
-    // this.dataNodes.forEach((d: any) => {
-    //   d.x0 = d.x;
-    //   d.y0 = d.y;
-    // });
   }
 
   private enterNodes(hierarchy: any): void {
@@ -108,7 +97,7 @@ export default class Node implements INode {
     const circleExpanders = expander.append(this.props.expander.selector);
     // append attrs
     for (let key in this.props.expander.attrs) {
-      circleExpanders.attr(key, this.props.label.attrs[key]);
+      circleExpanders.attr(key, this.props.expander.attrs[key]);
     }
 
     // append styles
@@ -130,7 +119,8 @@ export default class Node implements INode {
     const nodeExit = this.treeNodes.exit().transition()
       .duration(this.tree.props.animationTimeout)
       .attr('transform', (d: any) => {
-        return `translate(${hierarchy.x - this.props.width / 2},${hierarchy.y - this.props.height / 2})`;
+        return `translate(${hierarchy.x - this.props.width / 2},
+          ${hierarchy.y})`;
       })
       .remove();
 
@@ -147,10 +137,10 @@ export default class Node implements INode {
     this.initNodes(hierarchy);
     this.registerExit(hierarchy);
 
-    // TO Fix: it should not depend on node
-    this.link = new Link(this.tree);
+    // initial Link instance
+    const link = new Link(this.tree);
     const links = mappedHierarchy.descendants().slice(1);
-    this.link.load(hierarchy, links);
+    link.load(hierarchy, links);
   }
 
 }

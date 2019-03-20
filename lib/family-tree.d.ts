@@ -62,7 +62,8 @@ declare interface IMargin {
 declare interface ICanvasProps {
   width?: number,
   height?: number,
-  margin?: IMargin
+  margin?: IMargin,
+  attrs?: any
 }
 
 declare interface IEvents extends IObject {
@@ -84,8 +85,6 @@ declare interface IExpander {
  * Node Interface
  */
 declare interface INode extends IObject {
-  mappedHierarchy: any,
-  link: ILink,
   load: (previousNode?: any) => void
 }
 

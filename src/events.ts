@@ -16,31 +16,36 @@ export default class Events {
     }
 
     this.checkWidth(d);
-    console.log(d);
     this.tree.node.load(d);
   }
 
   private checkWidth(d: any) {
-    let currentCanvas = this.tree.canvas;
-    let adjustedHeight = parseInt(d3.select(this.tree.props.selector + '>svg').attr('height'), 10);
+    const currentCanvas = this.tree.canvas;
+    const timeout = this.tree.props.animationTimeout;
+    const adjustedHeight = parseInt(d3.select(this.tree.props.selector + '>svg').attr('height'), 10);
     // let adjustedHeight = parseInt(currentCanvas.attr('height'), 10);
     const margin = this.tree.props.canvas.margin;
+    const height = this.tree.props.canvas.height;
+    const width = this.tree.props.canvas.width;
 
     // currentWidth = currentCanvas.node().getBBox().width,
     setTimeout(function () {
-      let newCanvas = currentCanvas,
+      const newCanvas = currentCanvas,
         newHeight = newCanvas.node().getBBox().height,
         correctY = newCanvas.node().getBBox().y;
 
       if (newHeight > adjustedHeight) {
+        // currentCanvas.attr('viewBox', `${margin.left} ${(newHeight - adjustedHeight)} ${width} ${height}`);
         currentCanvas.transition()
-          .duration(currentCanvas.animationTimeout)
+          .duration(timeout)
+          .attr('viewBox', `${margin.left} ${(newHeight - adjustedHeight)} ${width} ${height}`)
           .attr('transform', `translate(${margin.left},-${(newHeight - adjustedHeight)})`);
       } else {
         currentCanvas.transition()
-          .duration(currentCanvas.duration)
+          .duration(timeout)
+          .attr('viewBox', `${margin.left} -${(-correctY + margin.top / 2)} ${width} ${height}`)
           .attr('transform', `translate(${margin.left},${(-correctY + margin.top / 2)})`);
       }
-    }, currentCanvas.duration);
+    }, timeout);
   };
 }

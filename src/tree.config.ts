@@ -6,6 +6,10 @@ export default {
   canvas: {
     width: 960,
     height: 600,
+    attrs: {
+      viewBox: '0 0 960 600',
+      preserveAspectRatio: 'xMinYMin meet'
+    },
     margin: {
       left: 0,
       right: 0,
@@ -73,11 +77,12 @@ export default {
     expander: {
       selector: 'circle',
       attrs: {
-        radius: 5,
+        r: 5,
       },
       styles: {
         'stroke': 'black',
         'stroke-width': 1,
+        'cursor': 'pointer',
         'fill': (d: any) => {
           // console.log(d.children, d.data.name);
           if (d._children === null) {
@@ -89,10 +94,16 @@ export default {
       text: {
         attrs: {
           'text-anchor': 'end',
+          'cursor': 'pointer',
           'transform': () => {
             return 'translate(3.5,4.5)';
           }
         },
+        // styles: {
+        //   'fill': '#fff',
+        //   'stroke': 'steelblue',
+        //   'stroke-width': '3px'
+        // },
         text: '+'
       }
     }

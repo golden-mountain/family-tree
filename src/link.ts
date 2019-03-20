@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 export default class Link {
   public name: 'Link';
 
-  private links: any;
   public props: ILinkProps = {}
 
   constructor(private tree: ITree) {
@@ -11,9 +10,10 @@ export default class Link {
   }
 
   private straightLine(source: any, target: any) {
-    let y = (source.y + target.y) / 2;
+    let y = (source.y + target.y) / 2 + this.tree.props.node.height / 2;
     let diagonal = `M${source.x},${source.y}
-    L${source.x},${y} L${target.x},${y} L${target.x},${target.y + this.tree.props.node.height / 2}`;
+    L${source.x},${y} L${target.x},${y} L${target.x},
+    ${target.y + this.tree.props.node.height}`;
 
     return diagonal;
   }
@@ -23,7 +23,7 @@ export default class Link {
       source,
       target: {
         x: target.x,
-        y: target.y + this.tree.props.node.height / 2 + 5
+        y: target.y + this.tree.props.node.height + this.tree.props.node.expander.attrs.r
       }
     };
 
@@ -49,9 +49,6 @@ export default class Link {
   }
 
   load(previousNode: any, links: any) {
-    // this.links = this.tree.node.mappedHierarchy.descendants().slice(1);
-
-    // let preNode = previousNode || this.tree.hierarchy.instance;
     // Update the links...
     const link = this.tree.canvas.selectAll('path.link')
       .data(links, function (d: any) {

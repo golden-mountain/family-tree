@@ -4,14 +4,14 @@ export default {
   selector: 'body',
   animationTimeout: 750,
   canvas: {
-    width: 960,
+    width: 1960,
     height: 600,
     attrs: {
-      viewBox: '0 0 960 600',
-      preserveAspectRatio: 'xMinYMin meet'
+      // viewBox: '0 0 960 600'
+      // preserveAspectRatio: 'xMinYMin meet'
     },
     margin: {
-      left: 0,
+      left: 100,
       right: 0,
       top: 0,
       bottom: 0
@@ -34,8 +34,6 @@ export default {
     }
   },
   node: {
-    width: 50,
-    height: 30,
     radius: 5,
     depth: 120,
     selector: 'g',
@@ -56,8 +54,8 @@ export default {
     attrs: {
       rx: 5,
       ry: 5,
-      width: 50,
-      height: 30
+      width: 100,
+      height: 50,
     },
     label: {
       attrs: {

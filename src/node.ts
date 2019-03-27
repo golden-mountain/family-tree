@@ -37,14 +37,15 @@ export default class Node implements INode {
       .duration(this.tree.props.animationTimeout)
       .attr('transform', (d: any) => {
         // TO FIX: Crashed on UT use this line
-        return `translate(${d.x - this.props.width / 2},${d.y})`;
+        return `translate(${d.x - this.props.attrs.width / 2},${d.y})`;
         // return `translate(${d.x},${d.y})`;
       });
 
   }
 
   private enterNodes(hierarchy: any): void {
-    this.treeNodes = this.tree.canvas.selectAll(`${this.props.selector}.${this.props.class}`)
+    // const g = this.tree.canvas.append('g.nodes');
+    this.treeNodes = this.tree.nodeCanvas.selectAll(`${this.props.selector}.${this.props.class}`)
       .data(this.dataNodes, (d: any) => {
         return d.id || (d.id = ++this.index);
       });
@@ -59,8 +60,10 @@ export default class Node implements INode {
 
     // append attrs
     for (let key in this.props.attrs) {
-      rects.style(key, this.props.attrs[key]);
+      rects.attr(key, this.props.attrs[key]);
     }
+    // rects.attr('width', this.props.attrs.width);
+    // rects.attr('height', this.props.attrs.height);
 
     // append styles
     for (let key in this.props.styles) {
@@ -71,7 +74,7 @@ export default class Node implements INode {
   private appendLabels(): void {
     const texts = this.domNodes.append('text');
 
-    // append styles
+    // append attrs
     for (let key in this.props.label.attrs) {
       texts.attr(key, this.props.label.attrs[key]);
     }
@@ -90,7 +93,7 @@ export default class Node implements INode {
         return 'none';
       })
       .attr('transform', (d: any) => {
-        return `translate(${this.props.width / 2},${this.props.height + 5})`;
+        return `translate(${this.props.attrs.width / 2},${this.props.attrs.height + 5})`;
       })
       .on('click', this.tree.events.expandingChildren.bind(this.tree.events));
 
@@ -119,7 +122,7 @@ export default class Node implements INode {
     const nodeExit = this.treeNodes.exit().transition()
       .duration(this.tree.props.animationTimeout)
       .attr('transform', (d: any) => {
-        return `translate(${hierarchy.x - this.props.width / 2},
+        return `translate(${hierarchy.x - this.props.attrs.width / 2},
           ${hierarchy.y})`;
       })
       .remove();
@@ -129,7 +132,12 @@ export default class Node implements INode {
   }
 
   public load(hierarchy: any) {
-    const treemap = d3.tree().size([this.tree.props.canvas.width, this.tree.props.canvas.height]);
+    const treemap = d3.tree();
+    // treemap.size([this.tree.props.canvas.width, this.tree.props.canvas.height]);
+    treemap.nodeSize([100, 50]);
+    treemap.separation(function (a, b) {
+      return 1.2;
+    });
     const mappedHierarchy = treemap(this.tree.hierarchy.instance);
     this.dataNodes = mappedHierarchy.descendants();
 

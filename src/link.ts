@@ -10,10 +10,10 @@ export default class Link {
   }
 
   private straightLine(source: any, target: any) {
-    let y = (source.y + target.y) / 2 + this.tree.props.node.height / 2;
+    let y = (source.y + target.y) / 2 + this.tree.props.node.attrs.height / 2;
     let diagonal = `M${source.x},${source.y}
     L${source.x},${y} L${target.x},${y} L${target.x},
-    ${target.y + this.tree.props.node.height}`;
+    ${target.y + this.tree.props.node.attrs.height + this.tree.props.node.expander.attrs.r * 2}`;
 
     return diagonal;
   }
@@ -23,7 +23,7 @@ export default class Link {
       source,
       target: {
         x: target.x,
-        y: target.y + this.tree.props.node.height + this.tree.props.node.expander.attrs.r
+        y: target.y + this.tree.props.node.attrs.height + this.tree.props.node.expander.attrs.r
       }
     };
 
@@ -50,13 +50,13 @@ export default class Link {
 
   load(previousNode: any, links: any) {
     // Update the links...
-    const link = this.tree.canvas.selectAll('path.link')
+    const link = this.tree.nodeCanvas.selectAll('path.link')
       .data(links, function (d: any) {
         return d.id;
       });
 
     // Enter any new links at the parent's previous position.
-    const linkEnter = link.enter().insert('path', 'g');
+    const linkEnter = link.enter().insert('path');
     // append attrs
     for (const key in this.props.attrs) {
       linkEnter.attr(key, this.props.attrs[key]);
@@ -76,7 +76,7 @@ export default class Link {
     }
 
     // UPDATE
-    let linkUpdate = linkEnter.merge(link);
+    const linkUpdate = linkEnter.merge(link);
 
     // Transition back to the parent element position
     linkUpdate
@@ -93,11 +93,17 @@ export default class Link {
       .transition()
       .duration(this.tree.props.animationTimeout)
       .attr('d', (d: any) => {
-        let o = {
+        const source = {
           x: previousNode.x,
           y: previousNode.y
         };
-        return this.diagonal(o, o);
+
+        const target = {
+          x: previousNode.x,
+          y: previousNode.y - this.tree.props.node.attrs.height - this.tree.props.node.expander.attrs.r
+        };
+
+        return this.diagonal(source, target);
       })
       .remove();
   }

@@ -20,13 +20,14 @@ export default class Events {
   }
 
   private checkWidth(d: any) {
-    const currentCanvas = this.tree.canvas;
+    const currentCanvas = this.tree.nodeCanvas;
     const timeout = this.tree.props.animationTimeout;
     const adjustedHeight = parseInt(d3.select(this.tree.props.selector + '>svg').attr('height'), 10);
     // let adjustedHeight = parseInt(currentCanvas.attr('height'), 10);
     const margin = this.tree.props.canvas.margin;
     const height = this.tree.props.canvas.height;
     const width = this.tree.props.canvas.width;
+    const center = width / 2;
 
     // currentWidth = currentCanvas.node().getBBox().width,
     setTimeout(function () {
@@ -38,13 +39,13 @@ export default class Events {
         // currentCanvas.attr('viewBox', `${margin.left} ${(newHeight - adjustedHeight)} ${width} ${height}`);
         currentCanvas.transition()
           .duration(timeout)
-          .attr('viewBox', `${margin.left} ${(newHeight - adjustedHeight)} ${width} ${height}`)
-          .attr('transform', `translate(${margin.left},-${(newHeight - adjustedHeight)})`);
+          .attr('viewBox', `${margin.left + center} ${(newHeight - adjustedHeight)} ${width} ${height}`)
+          .attr('transform', `translate(${margin.left + center},-${(newHeight - adjustedHeight)})`);
       } else {
         currentCanvas.transition()
           .duration(timeout)
-          .attr('viewBox', `${margin.left} -${(-correctY + margin.top / 2)} ${width} ${height}`)
-          .attr('transform', `translate(${margin.left},${(-correctY + margin.top / 2)})`);
+          .attr('viewBox', `${margin.left + center} -${(-correctY + margin.top / 2)} ${width} ${height}`)
+          .attr('transform', `translate(${margin.left + center},${(-correctY + margin.top / 2)})`);
       }
     }, timeout);
   };

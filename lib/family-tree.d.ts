@@ -14,6 +14,8 @@ declare interface ITree extends IObject {
   // below are d3 objects
   zoom: any,
   canvas: any,
+  nodeCanvas: any,
+  navCanvas: any,
   load: () => void
 }
 
@@ -32,8 +34,6 @@ declare interface ITreeProps {
 }
 
 declare interface INodeProps {
-  width?: number,
-  height?: number,
   radius?: number,
   depth?: number,
   selector?: string,
